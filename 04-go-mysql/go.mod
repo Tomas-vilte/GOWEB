@@ -1,4 +1,4 @@
-module mysql
+module dbmysql
 
 go 1.20
 
