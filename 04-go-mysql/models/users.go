@@ -5,11 +5,13 @@ import (
 )
 
 type User struct {
-	Id       int
+	Id       int64
 	Username string
 	Password string
 	Email    string
 }
+
+type Users []User
 
 const UserSchema string = `CREATE TABLE users (
 	id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -31,8 +33,23 @@ func CreateUser(username, password, email string) *User {
 	return user
 }
 
+// Insertar Registro
 func (usuario *User) insertar() {
 	sql := "INSERT users SET username=?, password=?, email=?"
-	db.Exec(sql, usuario.Username, usuario.Password, usuario.Email)
+	result, _ := db.Exec(sql, usuario.Username, usuario.Password, usuario.Email)
+	usuario.Id, _ = result.LastInsertId()
 
+}
+
+// Listar todos los registros
+func ListUsers() Users {
+	sql := "SELECT id, username, password , email FROM users"
+	users := Users{}
+	rows, _ := db.Query(sql)
+	for rows.Next() {
+		user := User{}
+		rows.Scan(&user.Id, &user.Username, &user.Password, &user.Email)
+		users = append(users, user)
+	}
+	return users
 }
