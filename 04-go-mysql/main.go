@@ -23,11 +23,14 @@ func main() {
 	fmt.Println(user)
 
 	// Actualizar registro
-	user.Username = "Joan"
-	user.Password = "Joan123"
-	user.Email = "Joan@gmail.com"
-	user.Save()
-	fmt.Println(models.ListUsers())
+	//user.Username = "Joan"
+	//user.Password = "Joan123"
+	//user.Email = "Joan@gmail.com"
+	//user.Save()
+	//fmt.Println(models.ListUsers())
+
+	// Eliminar registro
+	user.Delete()
 
 	//db.TruncateTable("users")
 	db.Close()
