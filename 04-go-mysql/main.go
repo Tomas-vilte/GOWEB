@@ -19,8 +19,15 @@ func main() {
 	//fmt.Println(users)
 
 	// Obtener usuario proporcionado el id
-	user := models.GetUser(3)
+	user := models.GetUser(2)
 	fmt.Println(user)
+
+	// Actualizar registro
+	user.Username = "Joan"
+	user.Password = "Joan123"
+	user.Email = "Joan@gmail.com"
+	user.Save()
+	fmt.Println(models.ListUsers())
 
 	//db.TruncateTable("users")
 	db.Close()
