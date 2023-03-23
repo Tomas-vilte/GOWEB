@@ -54,7 +54,23 @@ func CreateUser(rw http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateUser(rw http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(rw, "Actualiza un usuario")
+	rw.Header().Set("Content-Type", "application/json")
+
+	// Obtener registro
+	user := models.User{}
+
+	decoder := json.NewDecoder(r.Body)
+
+	if err := decoder.Decode(&user); err != nil {
+		fmt.Fprintln(rw, http.StatusUnprocessableEntity)
+	} else {
+		db.Connect()
+		user.Save()
+		db.Close()
+	}
+
+	output, _ := json.Marshal(user)
+	fmt.Println(rw, string(output))
 }
 
 func DeleteUser(rw http.ResponseWriter, r *http.Request) {
