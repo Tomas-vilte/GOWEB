@@ -31,3 +31,21 @@ func (resp *Response) Send() {
 	// Devolver los usuarios en formato JSON.
 	fmt.Fprintln(resp.respWrite, string(output))
 }
+
+func SendData(rw http.ResponseWriter, data interface{}) {
+	response := CreateDefaultResponse(rw)
+	response.Data = response
+	response.Send()
+}
+
+func (resp *Response) NoFound() {
+	resp.Status = http.StatusNotFound
+	resp.Message = "Resource No Found"
+
+}
+
+func SendNoFound(rw http.ResponseWriter) {
+	response := CreateDefaultResponse(rw)
+	response.NoFound()
+	response.Send()
+}
