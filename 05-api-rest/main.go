@@ -1,7 +1,7 @@
 package main
 
 import (
-	"apirest/handlers"
+	"apirest/controllers"
 	"log"
 	"net/http"
 
@@ -13,11 +13,11 @@ func main() {
 	mux := mux.NewRouter()
 
 	// Endpoints
-	mux.HandleFunc("/api/user/", handlers.GetUsers).Methods("GET")
-	mux.HandleFunc("/api/user/{id:[0-9]+}", handlers.GetUser).Methods("GET")
-	mux.HandleFunc("/api/user/", handlers.CreateUser).Methods("POST")
-	mux.HandleFunc("/api/user/{id:[0-9]+}", handlers.UpdateUser).Methods("PUT")
-	mux.HandleFunc("/api/user/{id:[0-9]+}", handlers.DeleteUser).Methods("DELETE")
+	mux.HandleFunc("/api/user/", controllers.GetUsers).Methods("GET")
+	mux.HandleFunc("/api/user/{id:[0-9]+}", controllers.GetUser).Methods("GET")
+	mux.HandleFunc("/api/user/", controllers.CreateUser).Methods("POST")
+	mux.HandleFunc("/api/user/{id:[0-9]+}", controllers.UpdateUser).Methods("PUT")
+	mux.HandleFunc("/api/user/{id:[0-9]+}", controllers.DeleteUser).Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe("localhost:8080", mux))
 }
