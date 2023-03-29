@@ -2,6 +2,7 @@ package main
 
 import (
 	"apirest/controllers"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -19,5 +20,6 @@ func main() {
 	mux.HandleFunc("/api/user/{id:[0-9]+}", controllers.UpdateUser).Methods("PUT")
 	mux.HandleFunc("/api/user/{id:[0-9]+}", controllers.DeleteUser).Methods("DELETE")
 
-	log.Fatal(http.ListenAndServe("localhost:8080", mux))
+	fmt.Println("Run server: http://localhost:9090")
+	log.Fatal(http.ListenAndServe("localhost:9090", mux))
 }

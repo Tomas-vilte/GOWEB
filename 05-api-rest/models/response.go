@@ -49,3 +49,14 @@ func SendNoFound(rw http.ResponseWriter) {
 	response.NoFound()
 	response.Send()
 }
+
+func (resp *Response) UnproccesableEntity() {
+	resp.Status = http.StatusUnprocessableEntity
+	resp.Message = "UnproccesableEntity No Found"
+}
+
+func SendUnproccesableEntity(rw http.ResponseWriter) {
+	response := CreateDefaultResponse(rw)
+	response.UnproccesableEntity()
+	response.Send()
+}

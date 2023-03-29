@@ -3,6 +3,7 @@ package db
 import (
 	"apirest/models"
 	"database/sql"
+	"fmt"
 )
 
 type UserPersistence interface {
@@ -13,7 +14,14 @@ type UserPersistence interface {
 	Delete(id int) error
 }
 
-func NewUserPersistence(db *sql.DB) UserPersistence {
+func NewUserPersistence() UserPersistence {
+	connection, err := sql.Open("mysql", url)
+	if err != nil {
+		panic(err)
+
+	}
+	fmt.Println("Conexion exitosa")
+	db = connection
 	return &userPersintence{db}
 }
 
@@ -35,7 +43,8 @@ func (persistence *userPersintence) GetUser(id int) (*models.User, error) {
 }
 
 func (persistence *userPersintence) GetUsers() ([]*models.User, error) {
-	rows, err := persistence.db.Query("SELECT * FROM users")
+	fmt.Printf("The value is: %p", persistence.db)
+	rows, err := persistence.db.Query("SELECT id, username, password, email FROM users")
 	if err != nil {
 		return nil, err
 	}
@@ -49,11 +58,12 @@ func (persistence *userPersintence) GetUsers() ([]*models.User, error) {
 			return nil, err
 		}
 		users = append(users, user)
+		fmt.Println("Usuarios:", users)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
-	return users, err
+	return users, nil
 }
 
 func (persistence *userPersintence) Save(user *models.User) error {

@@ -3,9 +3,7 @@ package controllers
 import (
 	"apirest/db"
 	"apirest/models"
-	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -14,96 +12,80 @@ import (
 
 // GetUsers obtiene todos los usuarios y los devuelve en formato JSON.
 func GetUsers(rw http.ResponseWriter, r *http.Request) {
-	// Establecer tipo de contenido de la respuesta.
-	rw.Header().Set("Content-Type", "application/json")
+	userPersistence := db.NewUserPersistence()
 
-	// Conectarse a la base de datos.
-	db.Connect()
-
-	// Obtener todos los usuarios.
-
-	userPersistencece := db.NewUserPersistence(&sql.DB{})
-	users, err := userPersistencece.GetUsers()
-	if err != nil {
-		println(err)
+	if users, err := userPersistence.GetUsers(); err != nil {
+		models.SendNoFound(rw)
+	} else {
+		models.SendData(rw, users)
 	}
-
-	// Cerrar la conexión con la base de datos.
-	db.Close()
-
-	// Convertir los usuarios a formato JSON.
-	output, _ := json.Marshal(users)
-
-	// Devolver los usuarios en formato JSON.
-	fmt.Fprintln(rw, string(output))
 }
 
 func GetUser(rw http.ResponseWriter, r *http.Request) {
-	rw.Header().Set("Content-Type", "application/json")
-
-	// Obtener id
-	vars := mux.Vars(r)
-	userId, _ := strconv.Atoi(vars["id"])
-
-	db.Connect()
-	userPersistencece := db.NewUserPersistence(&sql.DB{})
-	user, _ := userPersistencece.GetUser(userId)
-	db.Close()
-
-	output, _ := json.Marshal(user)
-	fmt.Fprintln(rw, string(output))
+	if user, err := getUserByRequest(r); err != nil {
+		models.SendNoFound(rw)
+	} else {
+		models.SendData(rw, user)
+	}
 }
 
 func CreateUser(rw http.ResponseWriter, r *http.Request) {
-	rw.Header().Set("Content-Type", "application/json")
 
 	// Obtener registro
 	user := models.User{}
 	decoder := json.NewDecoder(r.Body)
+	userPersistence := db.NewUserPersistence()
 
 	if err := decoder.Decode(&user); err != nil {
-		fmt.Fprintln(rw, http.StatusUnprocessableEntity)
+		models.SendUnproccesableEntity(rw)
 	} else {
-		db.Connect()
-		db.Close()
+		userPersistence.Save(&user)
+		models.SendData(rw, user)
 	}
-	output, _ := json.Marshal(user)
-	fmt.Fprintln(rw, string(output))
 }
 
 func UpdateUser(rw http.ResponseWriter, r *http.Request) {
-	rw.Header().Set("Content-Type", "application/json")
 
 	// Obtener registro
+	var userId int64
+	if user, err := getUserByRequest(r); err != nil {
+		models.SendNoFound(rw)
+	} else {
+		userId = user.Id
+	}
+
 	user := models.User{}
-	userPersistencece := db.NewUserPersistence(&sql.DB{})
+	userPersistence := db.NewUserPersistence()
 	decoder := json.NewDecoder(r.Body)
 
 	if err := decoder.Decode(&user); err != nil {
-		fmt.Fprintln(rw, http.StatusUnprocessableEntity)
+		models.SendUnproccesableEntity(rw)
 	} else {
-		db.Connect()
-		userPersistencece.Save(&user)
-		db.Close()
+		user.Id = userId
+		userPersistence.Save(&user)
+		models.SendData(rw, user)
 	}
-
-	output, _ := json.Marshal(user)
-	fmt.Println(rw, string(output))
 }
 
 func DeleteUser(rw http.ResponseWriter, r *http.Request) {
-	rw.Header().Set("Content-Type", "application/json")
+	userPersistence := db.NewUserPersistence()
+	if user, err := getUserByRequest(r); err != nil {
+		models.SendNoFound(rw)
+	} else {
+		userPersistence.Delete(int(user.Id))
+		models.SendData(rw, user)
+	}
+}
 
-	// Obtener ID
+func getUserByRequest(r *http.Request) (models.User, error) {
+	// Obtener Id
 	vars := mux.Vars(r)
 	userId, _ := strconv.Atoi(vars["id"])
+	userPersistence := db.NewUserPersistence()
+	if user, err := userPersistence.GetUser(userId); err != nil {
+		return *user, err
+	} else {
+		return *user, nil
+	}
 
-	db.Connect()
-	userPersistencece := db.NewUserPersistence(&sql.DB{})
-	user, _ := userPersistencece.GetUser(userId)
-	userPersistencece.Delete(userId)
-	db.Close()
-
-	output, _ := json.Marshal(user)
-	fmt.Fprintln(rw, string(output))
 }
