@@ -4,10 +4,10 @@ import (
 	"apirest/db"
 	"apirest/models"
 	"encoding/json"
+	"fmt"
+	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
-
-	"github.com/gorilla/mux"
 )
 
 // GetUsers obtiene todos los usuarios y los devuelve en formato JSON.
@@ -83,9 +83,10 @@ func getUserByRequest(r *http.Request) (models.User, error) {
 	userId, _ := strconv.Atoi(vars["id"])
 	userPersistence := db.NewUserPersistence()
 	if user, err := userPersistence.GetUser(userId); err != nil {
-		return *user, err
-	} else {
+		return models.User{}, err
+	} else if user != nil {
 		return *user, nil
+	} else {
+		return models.User{}, fmt.Errorf("Usuario no encontrado %d", userId)
 	}
-
 }

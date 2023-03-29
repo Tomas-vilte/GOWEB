@@ -30,6 +30,7 @@ type userPersintence struct {
 }
 
 func (persistence *userPersintence) GetUser(id int) (*models.User, error) {
+	fmt.Printf("The value is: %p", persistence.db)
 	user := &models.User{}
 	err := persistence.db.QueryRow("SELECT * FROM users WHERE id=?", id).Scan(&user.Id, &user.Username, &user.Password, &user.Email)
 	if err != nil {

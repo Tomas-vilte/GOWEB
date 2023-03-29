@@ -26,7 +26,10 @@ func (resp *Response) Send() {
 	resp.respWrite.Header().Set("Content-Type", resp.contentType)
 	resp.respWrite.WriteHeader(resp.Status)
 	// Convertir los usuarios a formato JSON.
-	output, _ := json.Marshal(&resp)
+	output, err := json.Marshal(&resp)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	// Devolver los usuarios en formato JSON.
 	fmt.Fprintln(resp.respWrite, string(output))
@@ -34,7 +37,7 @@ func (resp *Response) Send() {
 
 func SendData(rw http.ResponseWriter, data interface{}) {
 	response := CreateDefaultResponse(rw)
-	response.Data = response
+	response.Data = data
 	response.Send()
 }
 
