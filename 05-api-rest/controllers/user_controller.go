@@ -17,15 +17,18 @@ func GetUsers(rw http.ResponseWriter, r *http.Request) {
 	if users, err := userPersistence.GetUsers(); err != nil {
 		models.SendNoFound(rw)
 	} else {
-		models.SendData(rw, users)
+		models.SendData(rw, users, "Usuarios obtenidos con exito")
 	}
 }
 
 func GetUser(rw http.ResponseWriter, r *http.Request) {
+	// Obtener registro
 	if user, err := getUserByRequest(r); err != nil {
+		fmt.Println(err)
+	} else if user == nil {
 		models.SendNoFound(rw)
 	} else {
-		models.SendData(rw, user)
+		models.SendData(rw, user, "Usuario encontrado con exito")
 	}
 }
 
@@ -39,8 +42,11 @@ func CreateUser(rw http.ResponseWriter, r *http.Request) {
 	if err := decoder.Decode(&user); err != nil {
 		models.SendUnproccesableEntity(rw)
 	} else {
-		userPersistence.Save(&user)
-		models.SendData(rw, user)
+		err := userPersistence.Save(&user)
+		if err != nil {
+			fmt.Println(err)
+		}
+		models.SendData(rw, user, "Usuario creado con exito")
 	}
 }
 
@@ -53,7 +59,6 @@ func UpdateUser(rw http.ResponseWriter, r *http.Request) {
 	} else {
 		userId = user.Id
 	}
-
 	user := models.User{}
 	userPersistence := db.NewUserPersistence()
 	decoder := json.NewDecoder(r.Body)
@@ -62,8 +67,11 @@ func UpdateUser(rw http.ResponseWriter, r *http.Request) {
 		models.SendUnproccesableEntity(rw)
 	} else {
 		user.Id = userId
-		userPersistence.Save(&user)
-		models.SendData(rw, user)
+		err := userPersistence.Update(&user)
+		if err != nil {
+			fmt.Println(err)
+		}
+		models.SendData(rw, user, "Usuario actualizado con exito")
 	}
 }
 
@@ -72,21 +80,24 @@ func DeleteUser(rw http.ResponseWriter, r *http.Request) {
 	if user, err := getUserByRequest(r); err != nil {
 		models.SendNoFound(rw)
 	} else {
-		userPersistence.Delete(int(user.Id))
-		models.SendData(rw, user)
+		err := userPersistence.Delete(int(user.Id))
+		if err != nil {
+			fmt.Println(err)
+		}
+		models.SendData(rw, user, "Usuario eliminado con exito")
 	}
 }
 
-func getUserByRequest(r *http.Request) (models.User, error) {
+func getUserByRequest(r *http.Request) (*models.User, error) {
 	// Obtener Id
 	vars := mux.Vars(r)
 	userId, _ := strconv.Atoi(vars["id"])
 	userPersistence := db.NewUserPersistence()
 	if user, err := userPersistence.GetUser(userId); err != nil {
-		return models.User{}, err
-	} else if user != nil {
-		return *user, nil
+		return nil, err
+	} else if user == nil {
+		return nil, nil
 	} else {
-		return models.User{}, fmt.Errorf("Usuario no encontrado %d", userId)
+		return user, nil
 	}
 }

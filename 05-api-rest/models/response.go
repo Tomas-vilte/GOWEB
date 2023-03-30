@@ -35,10 +35,12 @@ func (resp *Response) Send() {
 	fmt.Fprintln(resp.respWrite, string(output))
 }
 
-func SendData(rw http.ResponseWriter, data interface{}) {
+func SendData(rw http.ResponseWriter, data interface{}, message string) {
 	response := CreateDefaultResponse(rw)
 	response.Data = data
+	response.Message = message
 	response.Send()
+
 }
 
 func (resp *Response) NoFound() {
@@ -62,4 +64,11 @@ func SendUnproccesableEntity(rw http.ResponseWriter) {
 	response := CreateDefaultResponse(rw)
 	response.UnproccesableEntity()
 	response.Send()
+}
+
+func SendServerError(rw http.ResponseWriter) {
+	rw.WriteHeader(http.StatusInternalServerError)
+	rw.Header().Set("Content-Type", "application/json")
+	response := Response{Status: http.StatusInternalServerError, Message: "Internal server error"}
+	json.NewEncoder(rw).Encode(response)
 }

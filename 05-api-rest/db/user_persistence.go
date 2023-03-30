@@ -32,13 +32,14 @@ type userPersintence struct {
 func (persistence *userPersintence) GetUser(id int) (*models.User, error) {
 	fmt.Printf("The value is: %p", persistence.db)
 	user := &models.User{}
-	err := persistence.db.QueryRow("SELECT * FROM users WHERE id=?", id).Scan(&user.Id, &user.Username, &user.Password, &user.Email)
+	err := persistence.db.QueryRow("SELECT id, username, password, email FROM users WHERE id=?", id).Scan(&user.Id, &user.Username, &user.Password, &user.Email)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
 		return nil, err
 	}
+	fmt.Println("Usuarios:", user)
 	return user, nil
 
 }
@@ -83,7 +84,8 @@ func (persistence *userPersintence) Save(user *models.User) error {
 }
 
 func (persistence *userPersintence) Update(user *models.User) error {
-	_, err := persistence.db.Exec("UPDATE users SET username=?, password=? email=? WHERE id=?", user.Username, user.Password, user.Email, user.Id)
+	_, err := persistence.db.Exec("UPDATE users SET username=?, password=?, email=? WHERE id=?", user.Username, user.Password, user.Email, user.Id)
+	fmt.Println(err)
 	if err != nil {
 		return err
 	}
