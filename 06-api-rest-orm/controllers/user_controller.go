@@ -1,26 +1,19 @@
 package controllers
 
 import (
-	"encoding/json"
-	"fmt"
+	"gorm/db"
 	"gorm/models"
 	"net/http"
-	"strconv"
-
-	"github.com/gorilla/mux"
 )
 
 // GetUsers obtiene todos los usuarios y los devuelve en formato JSON.
 func GetUsers(rw http.ResponseWriter, r *http.Request) {
-	userPersistence := db.NewUserPersistence()
-
-	if users, err := userPersistence.GetUsers(); err != nil {
-		models.SendNoFound(rw)
-	} else {
-		models.SendData(rw, users, "Usuarios obtenidos con exito")
-	}
+	users := models.User{}
+	db.Database.Find(&users)
+	models.SendData(rw, users, http.StatusOK)
 }
 
+/*
 func GetUser(rw http.ResponseWriter, r *http.Request) {
 	// Obtener registro
 	if user, err := getUserByRequest(r); err != nil {
@@ -101,3 +94,4 @@ func getUserByRequest(r *http.Request) (*models.User, error) {
 		return user, nil
 	}
 }
+*/

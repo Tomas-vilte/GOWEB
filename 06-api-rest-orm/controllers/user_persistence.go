@@ -15,13 +15,13 @@ type UserPersistence interface {
 }
 
 func NewUserPersistence() UserPersistence {
-	connection, err := sql.Open("mysql", url)
+	connection, err := sql.Open("mysql", "")
 	if err != nil {
 		panic(err)
 
 	}
 	fmt.Println("Conexion exitosa")
-	db = connection
+	db := connection
 	return &userPersintence{db}
 }
 

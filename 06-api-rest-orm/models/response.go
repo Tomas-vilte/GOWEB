@@ -35,10 +35,10 @@ func (resp *Response) Send() {
 	fmt.Fprintln(resp.respWrite, string(output))
 }
 
-func SendData(rw http.ResponseWriter, data interface{}, message string) {
+func SendData(rw http.ResponseWriter, data interface{}, status int) {
 	response := CreateDefaultResponse(rw)
 	response.Data = data
-	response.Message = message
+	//response.Message = message
 	response.Send()
 
 }
