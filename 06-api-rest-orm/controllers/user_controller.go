@@ -13,7 +13,7 @@ import (
 
 // GetUsers obtiene todos los usuarios y los devuelve en formato JSON.
 func GetUsers(rw http.ResponseWriter, r *http.Request) {
-	users := models.User{}
+	users := models.Users{}
 	db.Database.Find(&users)
 	models.SendData(rw, users, http.StatusOK)
 }
@@ -63,20 +63,14 @@ func UpdateUser(rw http.ResponseWriter, r *http.Request) {
 
 }
 
-/*
 func DeleteUser(rw http.ResponseWriter, r *http.Request) {
-	userPersistence := db.NewUserPersistence()
-	if user, err := getUserByRequest(r); err != nil {
+	if user, err := getUserById(r); err != nil {
 		models.SendNoFound(rw)
 	} else {
-		err := userPersistence.Delete(int(user.Id))
-		if err != nil {
-			fmt.Println(err)
-		}
-		models.SendData(rw, user, "Usuario eliminado con exito")
+		db.Database.Delete(&user)
+		models.SendData(rw, user, http.StatusOK)
 	}
 }
-*/
 
 func getUserById(r *http.Request) (models.User, *gorm.DB) {
 	// Obtener registro
