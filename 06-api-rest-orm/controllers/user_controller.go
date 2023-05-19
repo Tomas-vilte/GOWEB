@@ -4,6 +4,9 @@ import (
 	"gorm/db"
 	"gorm/models"
 	"net/http"
+	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 // GetUsers obtiene todos los usuarios y los devuelve en formato JSON.
@@ -13,18 +16,12 @@ func GetUsers(rw http.ResponseWriter, r *http.Request) {
 	models.SendData(rw, users, http.StatusOK)
 }
 
-/*
 func GetUser(rw http.ResponseWriter, r *http.Request) {
-	// Obtener registro
-	if user, err := getUserByRequest(r); err != nil {
-		fmt.Println(err)
-	} else if user == nil {
-		models.SendNoFound(rw)
-	} else {
-		models.SendData(rw, user, "Usuario encontrado con exito")
-	}
+	user := getUserById(r)
+	models.SendData(rw, user, http.StatusOK)
 }
 
+/*
 func CreateUser(rw http.ResponseWriter, r *http.Request) {
 
 	// Obtener registro
@@ -42,7 +39,9 @@ func CreateUser(rw http.ResponseWriter, r *http.Request) {
 		models.SendData(rw, user, "Usuario creado con exito")
 	}
 }
+*/
 
+/*
 func UpdateUser(rw http.ResponseWriter, r *http.Request) {
 
 	// Obtener registro
@@ -67,7 +66,9 @@ func UpdateUser(rw http.ResponseWriter, r *http.Request) {
 		models.SendData(rw, user, "Usuario actualizado con exito")
 	}
 }
+*/
 
+/*
 func DeleteUser(rw http.ResponseWriter, r *http.Request) {
 	userPersistence := db.NewUserPersistence()
 	if user, err := getUserByRequest(r); err != nil {
@@ -80,18 +81,15 @@ func DeleteUser(rw http.ResponseWriter, r *http.Request) {
 		models.SendData(rw, user, "Usuario eliminado con exito")
 	}
 }
-
-func getUserByRequest(r *http.Request) (*models.User, error) {
-	// Obtener Id
-	vars := mux.Vars(r)
-	userId, _ := strconv.Atoi(vars["id"])
-	userPersistence := db.NewUserPersistence()
-	if user, err := userPersistence.GetUser(userId); err != nil {
-		return nil, err
-	} else if user == nil {
-		return nil, nil
-	} else {
-		return user, nil
-	}
-}
 */
+
+func getUserById(r *http.Request) models.User {
+	// Obtener registro
+	vars := mux.Vars(r)
+
+	userId, _ := strconv.Atoi(vars["id"])
+
+	user := models.User{}
+	db.Database.First(&user, userId)
+	return user
+}
