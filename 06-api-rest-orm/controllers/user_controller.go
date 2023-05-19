@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"gorm/db"
 	"gorm/models"
 	"net/http"
@@ -21,52 +22,39 @@ func GetUser(rw http.ResponseWriter, r *http.Request) {
 	models.SendData(rw, user, http.StatusOK)
 }
 
-/*
 func CreateUser(rw http.ResponseWriter, r *http.Request) {
 
 	// Obtener registro
 	user := models.User{}
 	decoder := json.NewDecoder(r.Body)
-	userPersistence := db.NewUserPersistence()
 
 	if err := decoder.Decode(&user); err != nil {
 		models.SendUnproccesableEntity(rw)
 	} else {
-		err := userPersistence.Save(&user)
-		if err != nil {
-			fmt.Println(err)
-		}
-		models.SendData(rw, user, "Usuario creado con exito")
+		db.Database.Save(&user)
+		models.SendData(rw, user, http.StatusOK)
 	}
 }
-*/
 
-/*
 func UpdateUser(rw http.ResponseWriter, r *http.Request) {
-
 	// Obtener registro
-	var userId int64
-	if user, err := getUserByRequest(r); err != nil {
-		models.SendNoFound(rw)
-	} else {
-		userId = user.Id
-	}
+	var userId int
+
+	user_ant := getUserById(r)
+
+	userId = int(user_ant.Id)
+
 	user := models.User{}
-	userPersistence := db.NewUserPersistence()
 	decoder := json.NewDecoder(r.Body)
 
 	if err := decoder.Decode(&user); err != nil {
 		models.SendUnproccesableEntity(rw)
 	} else {
-		user.Id = userId
-		err := userPersistence.Update(&user)
-		if err != nil {
-			fmt.Println(err)
-		}
-		models.SendData(rw, user, "Usuario actualizado con exito")
+		user.Id = int64(userId)
+		db.Database.Save(&user)
+		models.SendData(rw, user, http.StatusOK)
 	}
 }
-*/
 
 /*
 func DeleteUser(rw http.ResponseWriter, r *http.Request) {
